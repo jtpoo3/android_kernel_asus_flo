@@ -47,13 +47,17 @@ struct dyn_hp_data {
 	struct early_suspend suspend;
 } *hp_data;
 
-/* Bring online each possible CPU up to max_online threshold */
-static inline void up_all(void)
+/*
+ * Bring online each possible CPU up to max_online threshold if lim is true or
+ * up to num_possible_cpus if lim is false
+ */
+static inline void up_all(bool lim)
 {
 	unsigned int cpu;
+	unsigned int max = (lim ? hp_data->max_online : num_possible_cpus());
 
 	for_each_possible_cpu(cpu)
-		if (!cpu_online(cpu) && num_online_cpus() < hp_data->max_online)
+		if (!cpu_online(cpu) && num_online_cpus() < max)
 			cpu_up(cpu);
 
 	hp_data->down_timer = 0;
@@ -64,9 +68,8 @@ static inline void down_all(void)
 {
 	unsigned int cpu;
 
-	for_each_possible_cpu(cpu)
-		if (!cpu && cpu_online(cpu) &&
-				num_online_cpus() > hp_data->min_online)
+	for_each_online_cpu(cpu)
+		if (cpu && num_online_cpus() > hp_data->min_online)
 			cpu_down(cpu);
 }
 
@@ -81,7 +84,7 @@ static __cpuinit void hp_late_resume(struct early_suspend *h)
 {
 	pr_debug("%s: num_online_cpus: %u\n", __func__, num_online_cpus());
 
-	up_all();
+	up_all(true);
 }
 
 /* Iterate through possible CPUs and bring online the first found offline one */
@@ -175,7 +178,8 @@ static void dyn_hp_disable(void)
 	flush_scheduled_work();
 	unregister_early_suspend(&hp_data->suspend);
 
-	up_all();
+	/* Driver is disabled bring online all CPUs unconditionally */
+	up_all(false);
 	hp_data->enabled = 0;
 }
 
@@ -242,7 +246,8 @@ static __cpuinit int set_min_online(const char *val,
 	ret = param_set_uint(val, kp);
 	if (ret == 0) {
 		hp_data->min_online = min_online;
-		up_all();
+		if (hp_data->enabled)
+			up_all(true);
 	}
 	return ret;
 }
@@ -269,8 +274,10 @@ static __cpuinit int set_max_online(const char *val,
 	ret = param_set_uint(val, kp);
 	if (ret == 0) {
 		hp_data->max_online = max_online;
-		down_all();
-		up_all();
+		if (hp_data->enabled) {
+			down_all();
+			up_all(true);
+		}
 	}
 	return ret;
 }
