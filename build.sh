@@ -27,7 +27,7 @@ export LOCALVERSION="-kangaroo"
 
 export ARCH=arm
 export SUBARCH=arm
-export PATH=$PATH:~/gcc-linaro-4.9-2016.02-x86_64_arm-eabi/bin/
+export PATH=$PATH:~/gc c-linaro-4.9-2016.02-x86_64_arm-eabi/bin/
 export CROSS_COMPILE=arm-eabi-
 
 make "flo_defconfig"
