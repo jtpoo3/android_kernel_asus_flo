@@ -23,14 +23,14 @@ echo "                                                      "
 echo -e "\033[0m                                            "
 
 DATE_START=$(date +"%s")
-export LOCALVERSION=""
+export LOCALVERSION="-Semaphore_N7"
 
 export ARCH=arm
 export SUBARCH=arm
 export PATH=$PATH:~/gcc-linaro-4.9-2016.02-x86_64_arm-eabi/bin/
 export CROSS_COMPILE=arm-eabi-
 
-make "flo_defconfig"
+make "semaphore_flo_defconfig"
 make -j2
 
 # Display build stats
