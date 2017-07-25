@@ -22,7 +22,7 @@ DATE_START=$(date +"%s")
 
 export ARCH=arm
 export SUBARCH=arm
-export PATH=$PATH:~/gcc-linaro-4.9.4-2017.01-x86_64_arm-eabi/bin/
+export PATH=$PATH:~/Documents/gcc-linaro-4.9.4-2017.01-x86_64_arm-eabi/bin/
 export CROSS_COMPILE=arm-eabi-
 
 make "flo_defconfig"
