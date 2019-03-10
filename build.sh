@@ -2,7 +2,7 @@
 
 DATE_START=$(date +"%s")
 
-export CROSS_COMPILE=${HOME}/toolchains/arm-eabi-4.8/bin/arm-eabi-
+export CROSS_COMPILE=${HOME}/Repos/arm-eabi-4.8/bin/arm-eabi-
 export ARCH=arm && export SUBARCH=arm
 make clean && make mrproper
 make flo_defconfig
